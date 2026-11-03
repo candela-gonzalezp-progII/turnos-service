@@ -1,4 +1,4 @@
-package com.integrador.domain.model;
+package com.integrador.turnos.domain.model;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;

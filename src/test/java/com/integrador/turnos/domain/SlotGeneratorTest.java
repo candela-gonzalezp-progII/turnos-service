@@ -1,4 +1,4 @@
-package com.integrador.domain;
+package com.integrador.turnos.domain;
 
 import com.integrador.turnos.domain.model.ProfessionalSummary;
 import com.integrador.turnos.domain.model.Slot;
