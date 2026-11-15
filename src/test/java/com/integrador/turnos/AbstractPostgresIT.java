@@ -19,9 +19,11 @@ public abstract class AbstractPostgresIT {
     }
 
     @DynamicPropertySource
-    static void properties(DynamicPropertyRegistry registry) {
+    static void datasourceProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
+        // Secreto SOLO para tests (el real viene del .env y nunca se sube al repo)
+        registry.add("security.jwt.secret", () -> "secreto-solo-para-tests-de-integracion-0123456789");
     }
 }
