@@ -2,6 +2,8 @@ package com.integrador.turnos.infrastructure.web;
 
 import com.integrador.turnos.application.exception.CatalogUnavailableException;
 import com.integrador.turnos.application.exception.ProfessionalNotFoundException;
+import com.integrador.turnos.application.exception.UserAlreadyExistsException;
+import com.integrador.turnos.domain.exception.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -36,9 +38,21 @@ public class ApiExceptionHandler {
         return problem(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Valor invalido para el parametro " + e.getName());
     }
 
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ProblemDetail> validation(ValidationException e) {
+        ResponseEntity<ProblemDetail> r = problem(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Hay datos invalidos");
+        r.getBody().setProperty("errors", e.errors());
+        return r;
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ProblemDetail> unreadable(HttpMessageNotReadableException e) {
         return problem(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "El cuerpo de la peticion no es un JSON valido");
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ProblemDetail> alreadyExists(UserAlreadyExistsException e) {
+        return problem(HttpStatus.CONFLICT, e.field().equals("email") ? "EMAIL_ALREADY_USED" : "LOGIN_ALREADY_USED", e.getMessage());
     }
 
     private static ResponseEntity<ProblemDetail> problem(HttpStatus status, String code, String detail) {
