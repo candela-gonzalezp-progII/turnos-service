@@ -1,4 +1,4 @@
-package com.integrador.catalogo;
+package com.integrador.turnos;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
