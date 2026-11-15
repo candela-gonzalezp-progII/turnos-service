@@ -20,7 +20,10 @@ public class AppConfig {
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setConnectTimeout((int) props.connectTimeout().toMillis());
         factory.setReadTimeout((int) props.readTimeout().toMillis());
-        RestClient client = RestClient.builder().baseUrl(props.baseUrl()).requestFactory(factory).build();
+        RestClient client = RestClient.builder()
+                .baseUrl(props.baseUrl())
+                .requestFactory(factory)
+                .build();
         return new CatalogRestAdapter(client);
     }
 

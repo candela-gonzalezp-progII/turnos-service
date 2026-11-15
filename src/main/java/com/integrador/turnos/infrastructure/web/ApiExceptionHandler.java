@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -33,6 +34,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ProblemDetail> invalidParameter(MethodArgumentTypeMismatchException e) {
         return problem(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Valor invalido para el parametro " + e.getName());
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ProblemDetail> unreadable(HttpMessageNotReadableException e) {
+        return problem(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "El cuerpo de la peticion no es un JSON valido");
     }
 
     private static ResponseEntity<ProblemDetail> problem(HttpStatus status, String code, String detail) {
