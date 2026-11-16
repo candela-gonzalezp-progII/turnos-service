@@ -15,7 +15,7 @@ public abstract class AbstractPostgresIT {
     }
 
     @DynamicPropertySource
-    static void properties(DynamicPropertyRegistry registry) {
+    static void datasourceProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);

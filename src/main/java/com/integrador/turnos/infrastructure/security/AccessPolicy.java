@@ -2,20 +2,25 @@ package com.integrador.turnos.infrastructure.security;
 
 import com.integrador.turnos.domain.model.Authorities;
 
-/**
- * Reglas de acceso de turnos-service en un solo lugar (puro, sin Spring, facil de testear).
- * Lo que no esta listado exige estar autenticado como usuario: por defecto se cierra, no se abre.
- */
 public class AccessPolicy {
 
     public Requirement requirementFor(String method, String path) {
-        if ("OPTIONS".equalsIgnoreCase(method)) {
+        // Permitir preflight requests de CORS sin token
+        if ("OPTIONS".equals(method)) {
             return Requirement.publicAccess();
         }
-        if (path.equals("/api/register") || path.equals("/api/authenticate")) {
+
+        // Rutas públicas (registro, login y errores)
+        if (path.startsWith("/api/account/login") || path.startsWith("/api/account/register") || path.equals("/error")) {
             return Requirement.publicAccess();
         }
-        // Cuenta, disponibilidad y (proximamente) reservas: solo usuarios finales
-        return Requirement.anyOf(Authorities.USER, Authorities.ADMIN);
+
+        // La sincronización es exclusiva para comunicación entre microservicios
+        if (path.startsWith("/api/sync")) {
+            return Requirement.anyOf("ROLE_SERVICE");
+        }
+
+        // Las consultas generales admiten usuarios, administradores y a otros microservicios
+        return Requirement.anyOf(Authorities.USER, Authorities.ADMIN, "ROLE_SERVICE");
     }
 }

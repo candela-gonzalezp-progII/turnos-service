@@ -29,29 +29,29 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler({IllegalArgumentException.class, MissingServletRequestParameterException.class})
-    public ResponseEntity<ProblemDetail> invalid(Exception e) {
+    ResponseEntity<ProblemDetail> invalid(Exception e) {
         return problem(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ProblemDetail> invalidParameter(MethodArgumentTypeMismatchException e) {
+    ResponseEntity<ProblemDetail> invalidParameter(MethodArgumentTypeMismatchException e) {
         return problem(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Valor invalido para el parametro " + e.getName());
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ProblemDetail> validation(ValidationException e) {
+    ResponseEntity<ProblemDetail> validation(ValidationException e) {
         ResponseEntity<ProblemDetail> r = problem(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "Hay datos invalidos");
         r.getBody().setProperty("errors", e.errors());
         return r;
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ProblemDetail> unreadable(HttpMessageNotReadableException e) {
+    ResponseEntity<ProblemDetail> unreadable(HttpMessageNotReadableException e) {
         return problem(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "El cuerpo de la peticion no es un JSON valido");
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ProblemDetail> alreadyExists(UserAlreadyExistsException e) {
+    ResponseEntity<ProblemDetail> alreadyExists(UserAlreadyExistsException e) {
         return problem(HttpStatus.CONFLICT, e.field().equals("email") ? "EMAIL_ALREADY_USED" : "LOGIN_ALREADY_USED", e.getMessage());
     }
 
