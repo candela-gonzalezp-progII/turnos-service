@@ -1,7 +1,20 @@
 package com.integrador.turnos.infrastructure.web;
 
+import com.integrador.turnos.application.exception.ConcurrentReservationUpdateException;
+import com.integrador.turnos.application.exception.HoldExpiredException;
+import com.integrador.turnos.application.exception.InvalidSlotException;
+import com.integrador.turnos.application.exception.ReservationNotCancellableException;
+import com.integrador.turnos.application.exception.ReservationNotFoundException;
+import com.integrador.turnos.application.exception.SlotUnavailableException;
+import com.integrador.turnos.domain.exception.InvalidReservationStateException;
 import com.integrador.turnos.application.exception.CatalogUnavailableException;
+import com.integrador.turnos.application.exception.CatedraRejectedException;
+import com.integrador.turnos.application.exception.CatedraUnavailableException;
+import com.integrador.turnos.application.exception.PhonePublishException;
+import com.integrador.turnos.application.exception.ProfessionalDisabledException;
+import com.integrador.turnos.application.exception.InvalidCredentialsException;
 import com.integrador.turnos.application.exception.ProfessionalNotFoundException;
+import com.integrador.turnos.application.exception.UserNotFoundException;
 import com.integrador.turnos.application.exception.UserAlreadyExistsException;
 import com.integrador.turnos.domain.exception.ValidationException;
 import org.springframework.http.HttpStatus;
@@ -53,6 +66,71 @@ public class ApiExceptionHandler {
     @ExceptionHandler(UserAlreadyExistsException.class)
     ResponseEntity<ProblemDetail> alreadyExists(UserAlreadyExistsException e) {
         return problem(HttpStatus.CONFLICT, e.field().equals("email") ? "EMAIL_ALREADY_USED" : "LOGIN_ALREADY_USED", e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    ResponseEntity<ProblemDetail> badCredentials(InvalidCredentialsException e) {
+        return problem(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Usuario o clave incorrectos");
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    ResponseEntity<ProblemDetail> userGone(UserNotFoundException e) {
+        return problem(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "La cuenta ya no existe");
+    }
+
+    @ExceptionHandler(ProfessionalDisabledException.class)
+    ResponseEntity<ProblemDetail> professionalDisabled(ProfessionalDisabledException e) {
+        return problem(HttpStatus.UNPROCESSABLE_ENTITY, "PROFESSIONAL_DISABLED", e.getMessage());
+    }
+
+    @ExceptionHandler(CatedraUnavailableException.class)
+    ResponseEntity<ProblemDetail> catedraDown(CatedraUnavailableException e) {
+        return problem(HttpStatus.SERVICE_UNAVAILABLE, "CATEDRA_UNAVAILABLE", "La catedra no esta disponible, reintente mas tarde");
+    }
+
+    @ExceptionHandler(CatedraRejectedException.class)
+    ResponseEntity<ProblemDetail> catedraRejected(CatedraRejectedException e) {
+        return problem(HttpStatus.BAD_GATEWAY, "CATEDRA_ERROR", "La catedra rechazo la operacion");
+    }
+
+    @ExceptionHandler(SlotUnavailableException.class)
+    ResponseEntity<ProblemDetail> slotTaken(SlotUnavailableException e) {
+        return problem(HttpStatus.CONFLICT, e.code(), e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidSlotException.class)
+    ResponseEntity<ProblemDetail> invalidSlot(InvalidSlotException e) {
+        return problem(HttpStatus.UNPROCESSABLE_ENTITY, e.code(), e.getMessage());
+    }
+
+    @ExceptionHandler(HoldExpiredException.class)
+    ResponseEntity<ProblemDetail> holdExpired(HoldExpiredException e) {
+        return problem(HttpStatus.GONE, "HOLD_EXPIRED", e.getMessage());
+    }
+
+    @ExceptionHandler(ReservationNotFoundException.class)
+    ResponseEntity<ProblemDetail> reservationNotFound(ReservationNotFoundException e) {
+        return problem(HttpStatus.NOT_FOUND, "RESERVATION_NOT_FOUND", "No existe la reserva");
+    }
+
+    @ExceptionHandler(InvalidReservationStateException.class)
+    ResponseEntity<ProblemDetail> invalidState(InvalidReservationStateException e) {
+        return problem(HttpStatus.CONFLICT, "INVALID_RESERVATION_STATE", e.getMessage());
+    }
+
+    @ExceptionHandler(ConcurrentReservationUpdateException.class)
+    ResponseEntity<ProblemDetail> concurrent(ConcurrentReservationUpdateException e) {
+        return problem(HttpStatus.CONFLICT, "CONCURRENT_UPDATE", "La reserva cambio en simultaneo, reintente");
+    }
+
+    @ExceptionHandler(PhonePublishException.class)
+    ResponseEntity<ProblemDetail> phonePublish(PhonePublishException e) {
+        return problem(HttpStatus.SERVICE_UNAVAILABLE, "KAFKA_UNAVAILABLE", "No se pudo enviar el telefono, reintente");
+    }
+
+    @ExceptionHandler(ReservationNotCancellableException.class)
+    ResponseEntity<ProblemDetail> notCancellable(ReservationNotCancellableException e) {
+        return problem(HttpStatus.CONFLICT, "RESERVATION_NOT_CANCELLABLE", e.getMessage());
     }
 
     private static ResponseEntity<ProblemDetail> problem(HttpStatus status, String code, String detail) {

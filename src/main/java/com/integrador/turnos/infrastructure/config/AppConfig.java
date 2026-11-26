@@ -2,6 +2,7 @@ package com.integrador.turnos.infrastructure.config;
 
 import com.integrador.turnos.application.port.in.GetAvailabilityUseCase;
 import com.integrador.turnos.application.port.out.CatalogPort;
+import com.integrador.turnos.application.port.out.OccupancyPort;
 import com.integrador.turnos.application.service.AvailabilityService;
 import com.integrador.turnos.infrastructure.catalogo.CatalogProperties;
 import com.integrador.turnos.infrastructure.catalogo.CatalogRestAdapter;
@@ -11,6 +12,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClient;
+
+import java.time.Clock;
+import java.time.ZoneId;
 
 @Configuration
 @EnableConfigurationProperties(CatalogProperties.class)
@@ -34,7 +38,8 @@ public class AppConfig {
     }
 
     @Bean
-    GetAvailabilityUseCase getAvailabilityUseCase(CatalogPort catalogPort) {
-        return new AvailabilityService(catalogPort);
+    GetAvailabilityUseCase getAvailabilityUseCase(CatalogPort catalogPort, OccupancyPort occupancyPort, Clock clock,
+                                                  TurnosProperties turnos) {
+        return new AvailabilityService(catalogPort, occupancyPort, clock, ZoneId.of(turnos.zone()));
     }
 }
