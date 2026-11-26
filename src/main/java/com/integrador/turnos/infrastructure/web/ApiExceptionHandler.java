@@ -1,7 +1,9 @@
 package com.integrador.turnos.infrastructure.web;
 
 import com.integrador.turnos.application.exception.CatalogUnavailableException;
+import com.integrador.turnos.application.exception.InvalidCredentialsException;
 import com.integrador.turnos.application.exception.ProfessionalNotFoundException;
+import com.integrador.turnos.application.exception.UserNotFoundException;
 import com.integrador.turnos.application.exception.UserAlreadyExistsException;
 import com.integrador.turnos.domain.exception.ValidationException;
 import org.springframework.http.HttpStatus;
@@ -53,6 +55,16 @@ public class ApiExceptionHandler {
     @ExceptionHandler(UserAlreadyExistsException.class)
     ResponseEntity<ProblemDetail> alreadyExists(UserAlreadyExistsException e) {
         return problem(HttpStatus.CONFLICT, e.field().equals("email") ? "EMAIL_ALREADY_USED" : "LOGIN_ALREADY_USED", e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    ResponseEntity<ProblemDetail> badCredentials(InvalidCredentialsException e) {
+        return problem(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "Usuario o clave incorrectos");
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    ResponseEntity<ProblemDetail> userGone(UserNotFoundException e) {
+        return problem(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "La cuenta ya no existe");
     }
 
     private static ResponseEntity<ProblemDetail> problem(HttpStatus status, String code, String detail) {
