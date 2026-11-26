@@ -18,7 +18,9 @@ class ReservationControllerTest {
     private final Reservation held = Fixtures.heldReservation("juan");
     private final ReservationController controller = new ReservationController(
             (login, pid, date, start) -> held, (login, id, f, l) -> held, (login, id) -> held,
-            (login, id, phone) -> held);
+            (login, id, phone) -> held,
+            login -> new com.integrador.turnos.application.port.in.MyReservationsUseCase.MyReservations(java.util.List.of(held), true),
+            (login, id, reason) -> held);
 
     @Test
     void iniciarDevuelve201ConElEstado() {
@@ -45,5 +47,17 @@ class ReservationControllerTest {
         assertThat(r.toString().contains("hold-1")).isFalse();
         assertThat(r.toString().contains("process-1")).isFalse();
         assertThat(r.toString().contains("juan")).isFalse();
+    }
+
+    @Test
+    void listarDevuelveVerificadoYLasReservas() {
+        var r = controller.mine("juan");
+        assertThat(r.verified()).isTrue();
+        assertThat(r.reservations()).hasSize(1);
+    }
+
+    @Test
+    void cancelarSinCuerpoEs200() {
+        assertThat(controller.cancel("juan", held.id(), null).status()).isEqualTo("HOLD_CREATED");
     }
 }

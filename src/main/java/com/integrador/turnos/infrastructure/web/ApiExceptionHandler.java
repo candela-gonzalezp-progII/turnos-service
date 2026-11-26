@@ -3,6 +3,7 @@ package com.integrador.turnos.infrastructure.web;
 import com.integrador.turnos.application.exception.ConcurrentReservationUpdateException;
 import com.integrador.turnos.application.exception.HoldExpiredException;
 import com.integrador.turnos.application.exception.InvalidSlotException;
+import com.integrador.turnos.application.exception.ReservationNotCancellableException;
 import com.integrador.turnos.application.exception.ReservationNotFoundException;
 import com.integrador.turnos.application.exception.SlotUnavailableException;
 import com.integrador.turnos.domain.exception.InvalidReservationStateException;
@@ -125,6 +126,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(PhonePublishException.class)
     ResponseEntity<ProblemDetail> phonePublish(PhonePublishException e) {
         return problem(HttpStatus.SERVICE_UNAVAILABLE, "KAFKA_UNAVAILABLE", "No se pudo enviar el telefono, reintente");
+    }
+
+    @ExceptionHandler(ReservationNotCancellableException.class)
+    ResponseEntity<ProblemDetail> notCancellable(ReservationNotCancellableException e) {
+        return problem(HttpStatus.CONFLICT, "RESERVATION_NOT_CANCELLABLE", e.getMessage());
     }
 
     private static ResponseEntity<ProblemDetail> problem(HttpStatus status, String code, String detail) {

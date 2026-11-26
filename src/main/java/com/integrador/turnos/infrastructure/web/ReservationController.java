@@ -1,7 +1,9 @@
 package com.integrador.turnos.infrastructure.web;
 
+import com.integrador.turnos.application.port.in.CancelReservationUseCase;
 import com.integrador.turnos.application.port.in.ConfirmReservationUseCase;
 import com.integrador.turnos.application.port.in.GetReservationUseCase;
+import com.integrador.turnos.application.port.in.MyReservationsUseCase;
 import com.integrador.turnos.application.port.in.StartReservationUseCase;
 import com.integrador.turnos.application.port.in.SubmitPhoneUseCase;
 import com.integrador.turnos.infrastructure.security.AuthAttributes;
@@ -24,13 +26,18 @@ public class ReservationController {
     private final ConfirmReservationUseCase confirm;
     private final GetReservationUseCase get;
     private final SubmitPhoneUseCase submitPhone;
+    private final MyReservationsUseCase mine;
+    private final CancelReservationUseCase cancel;
 
     public ReservationController(StartReservationUseCase start, ConfirmReservationUseCase confirm,
-                                 GetReservationUseCase get, SubmitPhoneUseCase submitPhone) {
+                                 GetReservationUseCase get, SubmitPhoneUseCase submitPhone,
+                                 MyReservationsUseCase mine, CancelReservationUseCase cancel) {
         this.start = start;
         this.confirm = confirm;
         this.get = get;
         this.submitPhone = submitPhone;
+        this.mine = mine;
+        this.cancel = cancel;
     }
 
     /** CU-10. 201: proceso creado con el horario bloqueado. */
@@ -64,6 +71,19 @@ public class ReservationController {
         }
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(ReservationResponse.from(
                 submitPhone.submit(login, id, body.phoneNumber())));
+    }
+
+    /** CU-14. Solo las reservas del usuario del token. */
+    @GetMapping
+    public MyReservationsResponse mine(@RequestAttribute(AuthAttributes.LOGIN) String login) {
+        return MyReservationsResponse.from(mine.list(login));
+    }
+
+    /** CU-15. Idempotente: cancelar una ya cancelada devuelve 200. Cuerpo opcional {"reason": "..."}. */
+    @PostMapping("/{id}/cancel")
+    public ReservationResponse cancel(@RequestAttribute(AuthAttributes.LOGIN) String login, @PathVariable String id,
+                                      @RequestBody(required = false) CancelReservationRequest body) {
+        return ReservationResponse.from(cancel.cancel(login, id, body == null ? null : body.reason()));
     }
 
     @GetMapping("/{id}")
