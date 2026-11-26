@@ -1,5 +1,11 @@
 package com.integrador.turnos.infrastructure.web;
 
+import com.integrador.turnos.application.exception.ConcurrentReservationUpdateException;
+import com.integrador.turnos.application.exception.HoldExpiredException;
+import com.integrador.turnos.application.exception.InvalidSlotException;
+import com.integrador.turnos.application.exception.ReservationNotFoundException;
+import com.integrador.turnos.application.exception.SlotUnavailableException;
+import com.integrador.turnos.domain.exception.InvalidReservationStateException;
 import com.integrador.turnos.application.exception.CatalogUnavailableException;
 import com.integrador.turnos.application.exception.CatedraRejectedException;
 import com.integrador.turnos.application.exception.CatedraUnavailableException;
@@ -83,6 +89,36 @@ public class ApiExceptionHandler {
     @ExceptionHandler(CatedraRejectedException.class)
     ResponseEntity<ProblemDetail> catedraRejected(CatedraRejectedException e) {
         return problem(HttpStatus.BAD_GATEWAY, "CATEDRA_ERROR", "La catedra rechazo la operacion");
+    }
+
+    @ExceptionHandler(SlotUnavailableException.class)
+    ResponseEntity<ProblemDetail> slotTaken(SlotUnavailableException e) {
+        return problem(HttpStatus.CONFLICT, e.code(), e.getMessage());
+    }
+
+    @ExceptionHandler(InvalidSlotException.class)
+    ResponseEntity<ProblemDetail> invalidSlot(InvalidSlotException e) {
+        return problem(HttpStatus.UNPROCESSABLE_ENTITY, e.code(), e.getMessage());
+    }
+
+    @ExceptionHandler(HoldExpiredException.class)
+    ResponseEntity<ProblemDetail> holdExpired(HoldExpiredException e) {
+        return problem(HttpStatus.GONE, "HOLD_EXPIRED", e.getMessage());
+    }
+
+    @ExceptionHandler(ReservationNotFoundException.class)
+    ResponseEntity<ProblemDetail> reservationNotFound(ReservationNotFoundException e) {
+        return problem(HttpStatus.NOT_FOUND, "RESERVATION_NOT_FOUND", "No existe la reserva");
+    }
+
+    @ExceptionHandler(InvalidReservationStateException.class)
+    ResponseEntity<ProblemDetail> invalidState(InvalidReservationStateException e) {
+        return problem(HttpStatus.CONFLICT, "INVALID_RESERVATION_STATE", e.getMessage());
+    }
+
+    @ExceptionHandler(ConcurrentReservationUpdateException.class)
+    ResponseEntity<ProblemDetail> concurrent(ConcurrentReservationUpdateException e) {
+        return problem(HttpStatus.CONFLICT, "CONCURRENT_UPDATE", "La reserva cambio en simultaneo, reintente");
     }
 
     private static ResponseEntity<ProblemDetail> problem(HttpStatus status, String code, String detail) {
