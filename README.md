@@ -55,9 +55,7 @@ nunca se reintentan a ciegas (se reconcilia por estado) y la recuperación conve
    - `CATEDRA_BASE_URL`, `CATEDRA_USERNAME`, `CATEDRA_PASSWORD`: los entrega la cátedra por otro canal (cuenta técnica única).
    - `CATEDRA_KAFKA_ENABLED=true` cuando la integración Kafka esté provisionada.
    - `CATALOGO_BASE_URL`: dirección de catalogo-service.
-   - `CORS_ALLOWED_ORIGINS`: orígenes web permitidos (vacío = ninguno; la app Android no lo necesita).
 2. `docker compose up -d` y `./gradlew bootRun`.
-   Todo en contenedores: `docker compose --profile app up -d --build`.
 
 El `.env` nunca se sube al repositorio.
 
