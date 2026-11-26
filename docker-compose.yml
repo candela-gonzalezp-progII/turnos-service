@@ -17,5 +17,20 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # Servicio completo en contenedor:  docker compose --profile app up -d --build
+  # (por defecto solo se levanta la base y el servicio se corre con ./gradlew bootRun)
+  turnos-service:
+    profiles: ["app"]
+    build: .
+    env_file: .env
+    environment:
+      DB_URL: jdbc:postgresql://postgres-turnos:5432/${DB_NAME:-turnos_db}
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres-turnos:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   turnos_pgdata:
