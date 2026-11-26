@@ -5,6 +5,10 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+/**
+ * Base de los tests de integracion con Postgres REAL (Testcontainers), nunca H2.
+ * El contenedor se levanta una sola vez y lo comparten todas las clases que heredan de esta.
+ */
 @SpringBootTest
 public abstract class AbstractPostgresIT {
 
@@ -15,15 +19,11 @@ public abstract class AbstractPostgresIT {
     }
 
     @DynamicPropertySource
-    static void datasourceProperties(DynamicPropertyRegistry registry) {
+    static void properties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
-        
-        // Valores falsos de JWT para que levante el contexto de Spring en los tests
-        registry.add("security.jwt.secret", () -> "este-es-un-secreto-falso-para-tests-muy-largo-1234567890");
-        registry.add("security.jwt.issuer", () -> "turnos-service");
-        registry.add("security.jwt.expiration", () -> "1h");
-        registry.add("security.jwt.service-token-ttl", () -> "60s");
+        // Secreto SOLO para tests (el real viene del .env y nunca se sube al repo)
+        registry.add("security.jwt.secret", () -> "secreto-solo-para-tests-de-integracion-0123456789");
     }
 }

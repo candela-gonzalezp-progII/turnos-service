@@ -44,7 +44,7 @@ class JwtAuthenticationFilterTest {
     void rutaPublicaPasaSinToken() throws Exception {
         MockFilterChain chain = new MockFilterChain();
 
-        MockHttpServletResponse res = call("OPTIONS", "/api/professionals", null, chain);
+        MockHttpServletResponse res = call("POST", "/api/register", null, chain);
 
         assertThat(res.getStatus()).isEqualTo(200);
         assertThat(chain.getRequest() != null).isEqualTo(true);
@@ -54,7 +54,7 @@ class JwtAuthenticationFilterTest {
     void sinTokenDa401ConProblemJson() throws Exception {
         MockFilterChain chain = new MockFilterChain();
 
-        MockHttpServletResponse res = call("GET", "/api/professionals", null, chain);
+        MockHttpServletResponse res = call("GET", "/api/account", null, chain);
 
         assertThat(res.getStatus()).isEqualTo(401);
         assertThat(res.getContentAsString().contains("\"code\":\"UNAUTHORIZED\"")).isEqualTo(true);
@@ -63,26 +63,21 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void tokenInvalidoDa401() throws Exception {
-        assertThat(call("GET", "/api/professionals", "Bearer basura", new MockFilterChain()).getStatus()).isEqualTo(401);
+        assertThat(call("GET", "/api/account", "Bearer basura", new MockFilterChain()).getStatus()).isEqualTo(401);
     }
 
     @Test
-    void tokenDeUsuarioEnRutaDeSyncDa403() throws Exception {
-        MockHttpServletResponse res = call("GET", "/api/sync/status", "Bearer " + token("ROLE_USER"), new MockFilterChain());
+    void tokenDeServicioEnRutaDeUsuarioDa403() throws Exception {
+        MockHttpServletResponse res = call("GET", "/api/account", "Bearer " + token("ROLE_SERVICE"), new MockFilterChain());
 
         assertThat(res.getStatus()).isEqualTo(403);
         assertThat(res.getContentAsString().contains("\"code\":\"FORBIDDEN\"")).isEqualTo(true);
     }
 
     @Test
-    void tokenDeServicioPuedeLeerSync() throws Exception {
-        assertThat(call("GET", "/api/sync/status", "Bearer " + token("ROLE_SERVICE"), new MockFilterChain()).getStatus()).isEqualTo(200);
-    }
-
-    @Test
     void tokenDeUsuarioPasaYDejaElLogin() throws Exception {
         MockFilterChain chain = new MockFilterChain();
-        MockHttpServletRequest req = new MockHttpServletRequest("GET", "/api/professionals");
+        MockHttpServletRequest req = new MockHttpServletRequest("GET", "/api/account");
         req.addHeader("Authorization", "Bearer " + token("ROLE_USER"));
 
         filter.doFilter(req, new MockHttpServletResponse(), chain);

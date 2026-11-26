@@ -32,13 +32,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    ServiceTokenProvider serviceTokenProvider(HmacJwtService jwt, JwtProperties props) {
-        return new ServiceTokenProvider(jwt, props.serviceTokenTtl());
+    TokenIssuerPort tokenIssuer(HmacJwtService jwt, JwtProperties props) {
+        return new JwtTokenIssuer(jwt, props.expiration());
     }
 
     @Bean
-    TokenIssuerPort tokenIssuer(HmacJwtService jwt, JwtProperties props) {
-        return new JwtTokenIssuer(jwt, props.expiration());
+    ServiceTokenProvider serviceTokenProvider(HmacJwtService jwt, JwtProperties props) {
+        return new ServiceTokenProvider(jwt, props.serviceTokenTtl());
     }
 
     @Bean
