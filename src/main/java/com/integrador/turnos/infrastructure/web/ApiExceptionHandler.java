@@ -1,6 +1,9 @@
 package com.integrador.turnos.infrastructure.web;
 
 import com.integrador.turnos.application.exception.CatalogUnavailableException;
+import com.integrador.turnos.application.exception.CatedraRejectedException;
+import com.integrador.turnos.application.exception.CatedraUnavailableException;
+import com.integrador.turnos.application.exception.ProfessionalDisabledException;
 import com.integrador.turnos.application.exception.InvalidCredentialsException;
 import com.integrador.turnos.application.exception.ProfessionalNotFoundException;
 import com.integrador.turnos.application.exception.UserNotFoundException;
@@ -65,6 +68,21 @@ public class ApiExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     ResponseEntity<ProblemDetail> userGone(UserNotFoundException e) {
         return problem(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "La cuenta ya no existe");
+    }
+
+    @ExceptionHandler(ProfessionalDisabledException.class)
+    ResponseEntity<ProblemDetail> professionalDisabled(ProfessionalDisabledException e) {
+        return problem(HttpStatus.UNPROCESSABLE_ENTITY, "PROFESSIONAL_DISABLED", e.getMessage());
+    }
+
+    @ExceptionHandler(CatedraUnavailableException.class)
+    ResponseEntity<ProblemDetail> catedraDown(CatedraUnavailableException e) {
+        return problem(HttpStatus.SERVICE_UNAVAILABLE, "CATEDRA_UNAVAILABLE", "La catedra no esta disponible, reintente mas tarde");
+    }
+
+    @ExceptionHandler(CatedraRejectedException.class)
+    ResponseEntity<ProblemDetail> catedraRejected(CatedraRejectedException e) {
+        return problem(HttpStatus.BAD_GATEWAY, "CATEDRA_ERROR", "La catedra rechazo la operacion");
     }
 
     private static ResponseEntity<ProblemDetail> problem(HttpStatus status, String code, String detail) {

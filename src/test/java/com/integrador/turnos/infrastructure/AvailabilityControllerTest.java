@@ -26,9 +26,10 @@ class AvailabilityControllerTest {
 
     @Test
     void devuelveLosTurnosDelDiaEnElContratoPublico() {
-        var controller = new AvailabilityController(new AvailabilityService(id -> ana));
+        var controller = new AvailabilityController(new AvailabilityService(id -> ana, (id, f, t) -> java.util.List.of(),
+                java.time.Clock.fixed(java.time.Instant.parse("2026-11-01T00:00:00Z"), java.time.ZoneOffset.UTC), java.time.ZoneOffset.UTC));
 
-        AvailabilityResponse response = controller.availability(15L, LocalDate.of(2026, 11, 2));
+        AvailabilityResponse response = controller.availability(15L, LocalDate.of(2026, 11, 23));
 
         assertThat(response.professionalName()).isEqualTo("Ana Gomez");
         assertThat(response.slots()).hasSize(2);
