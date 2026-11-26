@@ -92,4 +92,14 @@ class ReservationTest {
         assertThat(r.toString().contains("5492615551234")).isFalse();
         assertThat(r.toString().contains("Perez")).isFalse();
     }
+
+    @Test
+    void conElTelefonoEnviadoSeEsperaUnMargenAntesDeVencer() {
+        Reservation r = Fixtures.heldReservation("juan");
+        r.confirmationStarted(PatientName.of("Juan", "Perez"), NOW);
+        r.infoRequested("e", null, NOW);
+        r.infoSubmitted("+5492615551234", NOW);
+        assertThat(r.isOverdueAt(NOW.plusSeconds(901))).isFalse();     // paso el vencimiento pero esta en el margen
+        assertThat(r.isOverdueAt(NOW.plusSeconds(900 + 121))).isTrue();
+    }
 }

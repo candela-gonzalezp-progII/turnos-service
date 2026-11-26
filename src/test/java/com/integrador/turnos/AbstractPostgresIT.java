@@ -23,6 +23,8 @@ public abstract class AbstractPostgresIT {
         registry.add("spring.datasource.url", POSTGRES::getJdbcUrl);
         registry.add("spring.datasource.username", POSTGRES::getUsername);
         registry.add("spring.datasource.password", POSTGRES::getPassword);
+        // Los tests de integracion no corren la recuperacion ni conectan con la catedra
+        registry.add("turnos.recovery-enabled", () -> "false");
         // Secreto SOLO para tests (el real viene del .env y nunca se sube al repo)
         registry.add("security.jwt.secret", () -> "secreto-solo-para-tests-de-integracion-0123456789");
     }

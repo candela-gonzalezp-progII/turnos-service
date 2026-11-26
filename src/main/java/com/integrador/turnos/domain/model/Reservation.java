@@ -15,6 +15,8 @@ import java.util.UUID;
  */
 public class Reservation {
 
+    static final java.time.Duration SUBMITTED_GRACE = java.time.Duration.ofMinutes(2);
+
     private final String id;
     private final String userLogin;
     private final long professionalId;
@@ -155,9 +157,16 @@ public class Reservation {
         return holdExpiresAt != null && holdExpiresAt.isAfter(now);
     }
 
-    /** Proceso pendiente cuyo vencimiento ya paso. */
+    /**
+     * Proceso pendiente cuyo vencimiento ya paso. Si el telefono ya se envio (INFO_SUBMITTED) se espera un
+     * margen de 2 minutos: la confirmacion puede estar en camino y un estado final no se reabre.
+     */
     public boolean isOverdueAt(Instant now) {
-        return isPending() && holdExpiresAt != null && !holdExpiresAt.isAfter(now);
+        if (!isPending() || holdExpiresAt == null) {
+            return false;
+        }
+        Instant limit = status == ReservationStatus.INFO_SUBMITTED ? holdExpiresAt.plus(SUBMITTED_GRACE) : holdExpiresAt;
+        return !limit.isAfter(now);
     }
 
     /** La app debe pedirle el telefono al usuario. */
