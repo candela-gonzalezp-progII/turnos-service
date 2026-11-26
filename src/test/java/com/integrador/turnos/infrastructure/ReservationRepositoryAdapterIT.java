@@ -6,10 +6,8 @@ import com.integrador.turnos.application.port.out.ReservationRepositoryPort;
 import com.integrador.turnos.domain.model.Reservation;
 import com.integrador.turnos.domain.model.ReservationStatus;
 import com.integrador.turnos.support.Fixtures;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.time.LocalTime;
 
@@ -22,26 +20,18 @@ class ReservationRepositoryAdapterIT extends AbstractPostgresIT {
     @Autowired
     ReservationRepositoryPort repo;
 
-    @Autowired
-    JdbcTemplate jdbc;
-
-    @BeforeEach
-    void clean() {
-        jdbc.execute("DELETE FROM reservation");
-    }
-
     @Test
     void guardaYRecuperaPorIdYUsuario() {
-        Reservation saved = repo.save(Fixtures.heldReservation("it-user-1"));
+        Reservation saved = repo.save(Fixtures.heldReservation("it-user-1", "hold-it-1", "process-it-1"));
         assertThat(saved.version()).isEqualTo(0L);
-        assertThat(repo.findByIdAndUser(saved.id(), "it-user-1")).isNotNull();
+        assertThat(repo.findByIdAndUser(saved.id(), "it-user-1").isPresent()).isTrue();
         assertThat(repo.findByIdAndUser(saved.id(), "otro").isPresent()).isFalse();
-        assertThat(repo.findByCatedraProcessId("process-1").isPresent() || true).isTrue();
+        assertThat(repo.findByCatedraProcessId("process-it-1").get().id()).isEqualTo(saved.id());
     }
 
     @Test
     void dosActualizacionesConLaMismaVersionFallanLaSegunda() {
-        Reservation saved = repo.save(Fixtures.heldReservation("it-user-2"));
+        Reservation saved = repo.save(Fixtures.heldReservation("it-user-2", "hold-it-2", "process-it-2"));
         Reservation a = repo.findById(saved.id()).get();
         Reservation b = repo.findById(saved.id()).get();
         a.expire("X", Fixtures.NOW);

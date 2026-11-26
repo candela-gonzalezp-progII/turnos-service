@@ -45,8 +45,13 @@ public final class Fixtures {
 
     /** Reserva con hold creado, vence 15 minutos despues de NOW. */
     public static Reservation heldReservation(String user) {
+        return heldReservation(user, "hold-1", "process-1");
+    }
+
+    /** Para tests de integracion: los ids de la catedra son unicos en la BD, hay que variarlos. */
+    public static Reservation heldReservation(String user, String holdId, String processId) {
         Reservation r = Reservation.request(user, 15L, "Ana Gomez", MONDAY, LocalTime.of(9, 0), LocalTime.of(9, 30), NOW);
-        r.holdCreated("hold-1", "process-1", NOW.plusSeconds(900), NOW);
+        r.holdCreated(holdId, processId, NOW.plusSeconds(900), NOW);
         return r;
     }
 }

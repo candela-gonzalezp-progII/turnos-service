@@ -26,6 +26,8 @@ dependencies {
 	implementation 'org.flywaydb:flyway-database-postgresql'
 	// Solo BCrypt (hash de claves). No se usa Spring Security completo.
 	implementation 'org.springframework.security:spring-security-crypto'
+	// Cliente Kafka directo (consumidor/productor manual con commit controlado); version la fija el BOM de Spring Boot
+	implementation 'org.apache.kafka:kafka-clients'
 	runtimeOnly 'org.postgresql:postgresql'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
