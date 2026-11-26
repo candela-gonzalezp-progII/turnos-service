@@ -9,6 +9,7 @@ import com.integrador.turnos.domain.exception.InvalidReservationStateException;
 import com.integrador.turnos.application.exception.CatalogUnavailableException;
 import com.integrador.turnos.application.exception.CatedraRejectedException;
 import com.integrador.turnos.application.exception.CatedraUnavailableException;
+import com.integrador.turnos.application.exception.PhonePublishException;
 import com.integrador.turnos.application.exception.ProfessionalDisabledException;
 import com.integrador.turnos.application.exception.InvalidCredentialsException;
 import com.integrador.turnos.application.exception.ProfessionalNotFoundException;
@@ -119,6 +120,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(ConcurrentReservationUpdateException.class)
     ResponseEntity<ProblemDetail> concurrent(ConcurrentReservationUpdateException e) {
         return problem(HttpStatus.CONFLICT, "CONCURRENT_UPDATE", "La reserva cambio en simultaneo, reintente");
+    }
+
+    @ExceptionHandler(PhonePublishException.class)
+    ResponseEntity<ProblemDetail> phonePublish(PhonePublishException e) {
+        return problem(HttpStatus.SERVICE_UNAVAILABLE, "KAFKA_UNAVAILABLE", "No se pudo enviar el telefono, reintente");
     }
 
     private static ResponseEntity<ProblemDetail> problem(HttpStatus status, String code, String detail) {

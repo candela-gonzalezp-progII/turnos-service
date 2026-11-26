@@ -17,7 +17,8 @@ class ReservationControllerTest {
 
     private final Reservation held = Fixtures.heldReservation("juan");
     private final ReservationController controller = new ReservationController(
-            (login, pid, date, start) -> held, (login, id, f, l) -> held, (login, id) -> held);
+            (login, pid, date, start) -> held, (login, id, f, l) -> held, (login, id) -> held,
+            (login, id, phone) -> held);
 
     @Test
     void iniciarDevuelve201ConElEstado() {
